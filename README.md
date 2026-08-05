@@ -1,6 +1,6 @@
 # Wabi Estate (자취방 전월세 시세 대시보드)
 
-![Wabi Estate Preview](./public/estate.png)
+![Wabi Estate Preview](./public/estate.png?v=2)
 > ※GPT 이미지 생성 모델을 통해 제작되었습니다.
 
 서울·경기 대학가와 업무지구의 오피스텔·연립다세대·단독다가구 전월세 실거래가 추이를 보여주는 풀스택 대시보드입니다. 로컬 데이터 파이프라인(Airflow)이 실거래 데이터를 수집·정제·집계해 Supabase(Postgres)로 자동 동기화하고, Vercel에 배포된 Next.js 프론트엔드가 이를 서빙하는 하이브리드 아키텍처를 가집니다.

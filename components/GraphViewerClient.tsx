@@ -27,44 +27,86 @@ export default function GraphViewerClient({ data, onNodeClick }: { data: any, on
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const paintNode = useCallback((node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
-    const label = node.label || '';
-    const fontSize = 14 / globalScale;
-    ctx.font = `bold ${fontSize}px "Nunito", sans-serif`;
-    const textWidth = ctx.measureText(label).width;
-    const padding = fontSize * 1.5;
-    const bgWidth = textWidth + padding * 2;
-    const bgHeight = fontSize * 2.5;
+    if (node.x === undefined || node.y === undefined || !globalScale) return;
 
-    let bgColor = '#2C4C3B'; // default
-    let textColor = '#FFFFFF';
+    const label = node.label || "";
+    const fontSize = 12 / globalScale;
+    const lines = label.split('\n');
     
-    if (node.group === 'user') {
-      bgColor = '#1A2421';
-    } else if (node.group === 'region') {
-      bgColor = '#6B8E6B';
-    } else if (node.group === 'info') {
-      bgColor = '#D98A6C';
-    } else if (node.group === 'property') {
-      bgColor = '#A4B494';
-      textColor = '#1A2421';
+    let coreColor = '#A85448';
+    let orbitColor = 'rgba(168, 84, 72, 0.4)';
+    let orbitColorOuter = 'rgba(168, 84, 72, 0.15)';
+    
+    if (node.group === 'user') { 
+      coreColor = '#5D7052'; orbitColor = 'rgba(93, 112, 82, 0.5)'; orbitColorOuter = 'rgba(93, 112, 82, 0.2)'; 
+    } else if (node.group === 'region') { 
+      coreColor = '#C18C5D'; orbitColor = 'rgba(193, 140, 93, 0.5)'; orbitColorOuter = 'rgba(193, 140, 93, 0.2)'; 
+    } else if (node.group === 'property') { 
+      coreColor = '#D98A6C'; orbitColor = 'rgba(217, 138, 108, 0.5)'; orbitColorOuter = 'rgba(217, 138, 108, 0.2)'; 
     }
+    
+    const r = 3 / globalScale; // 중심핵(Core)
+    const orbit1 = 7 / globalScale; // 안쪽 궤도
+    const orbit2 = 12 / globalScale; // 바깥쪽 궤도
 
-    ctx.fillStyle = bgColor;
+    // 1. 바깥쪽 궤도 그리기 (Outer Orbit)
     ctx.beginPath();
-    // Fallback for older browsers if roundRect isn't supported, though nextjs apps usually run on modern browsers
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((ctx as any).roundRect) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (ctx as any).roundRect(node.x - bgWidth / 2, node.y - bgHeight / 2, bgWidth, bgHeight, [bgHeight / 2]);
-    } else {
-      ctx.rect(node.x - bgWidth / 2, node.y - bgHeight / 2, bgWidth, bgHeight);
-    }
+    ctx.arc(node.x, node.y, orbit2, 0, 2 * Math.PI, false);
+    ctx.lineWidth = 0.5 / globalScale;
+    ctx.strokeStyle = orbitColorOuter;
+    ctx.stroke();
+
+    // 2. 안쪽 궤도 그리기 (Inner Orbit)
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, orbit1, 0, 2 * Math.PI, false);
+    ctx.lineWidth = 1.2 / globalScale;
+    ctx.strokeStyle = orbitColor;
+    ctx.stroke();
+
+    // 3. 중심핵 그리기 (Core Dot)
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, r, 0, 2 * Math.PI, false);
+    ctx.fillStyle = coreColor;
     ctx.fill();
 
+    // 4. 텍스트 설정
+    ctx.font = `600 ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
     ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle = textColor;
-    ctx.fillText(label, node.x, node.y);
+    ctx.textBaseline = 'top';
+    
+    let maxWidth = 0;
+    lines.forEach((line: string) => {
+      const w = ctx.measureText(line).width;
+      if (w > maxWidth) maxWidth = w;
+    });
+    
+    const textHeight = lines.length * (fontSize * 1.3);
+    const paddingX = 4 / globalScale;
+    const paddingY = 2 / globalScale;
+    // 궤도 바깥에 텍스트 배치
+    const textY = node.y + orbit2 + (4 / globalScale); 
+    
+    // 5. 텍스트 가독성을 위한 아주 옅은 반투명 배경창
+    ctx.fillStyle = 'rgba(253, 252, 248, 0.7)';
+    ctx.fillRect(
+      node.x - maxWidth/2 - paddingX, 
+      textY - paddingY, 
+      maxWidth + paddingX*2, 
+      textHeight + paddingY*2
+    );
+
+    // 6. 텍스트 렌더링
+    ctx.fillStyle = '#4A4A40'; 
+    lines.forEach((line: string, i: number) => {
+      ctx.fillText(line, node.x, textY + (i * fontSize * 1.3));
+    });
+    
+    // Hover/Click 영역 계산 캐싱
+    node.__pointerBox = { 
+      w: Math.max(maxWidth + paddingX*2, orbit2*2), 
+      h: textHeight + paddingY*2 + orbit2 + (4/globalScale) + orbit2, 
+      y: node.y - orbit2
+    };
   }, []);
 
   return (
@@ -76,6 +118,17 @@ export default function GraphViewerClient({ data, onNodeClick }: { data: any, on
         nodeLabel={() => ''}
         nodeCanvasObject={paintNode}
         onNodeClick={handleNodeClick}
+        nodePointerAreaPaint={(node: any, color, ctx) => {
+          ctx.fillStyle = color;
+          const pBox = node.__pointerBox;
+          if (pBox) {
+            ctx.fillRect(node.x - pBox.w/2, pBox.y, pBox.w, pBox.h);
+          } else {
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, 8, 0, 2 * Math.PI, false);
+            ctx.fill();
+          }
+        }}
         linkColor={() => '#E5E7E1'}
         linkWidth={2}
         backgroundColor="transparent"

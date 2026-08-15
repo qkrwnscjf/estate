@@ -3,9 +3,9 @@ import Groq from 'groq-sdk';
 import { getRegionSummary, getRegionTrend, getAllRegions, getProperties } from '@/lib/queries';
 import { mapToGraphData } from '@/lib/graph-mapper';
 
-// Next.js 환경변수에 저장된 GROQ_API_KEY 자동 인식
+// Next.js 빌드 타임에 환경변수가 없어 에러나는 것을 방지하기 위해 fallback(dummy) 값 추가
 const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY
+  apiKey: process.env.GROQ_API_KEY || 'dummy_key_for_build'
 });
 
 export async function POST(req: Request) {

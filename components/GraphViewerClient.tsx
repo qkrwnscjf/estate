@@ -118,6 +118,7 @@ export default function GraphViewerClient({ data, onNodeClick }: { data: any, on
         nodeLabel={() => ''}
         nodeCanvasObject={paintNode}
         onNodeClick={handleNodeClick}
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         nodePointerAreaPaint={(node: any, color, ctx) => {
           ctx.fillStyle = color;
           const pBox = node.__pointerBox;

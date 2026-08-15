@@ -20,3 +20,21 @@ export interface CompareResult {
   regionName: string;
   trend: TrendPoint[];
 }
+
+export interface Property {
+  id: string;
+  regionCode: string;
+  name: string;
+  deposit: number;
+  monthlyRent: number;
+  address: string;
+  url: string;
+  features: string[];
+  lat?: number;
+  lng?: number;
+  contractDate?: string;
+  imageUrl?: string;
+  monthlyAverage?: string;
+  surroundings?: { type: string; name: string; distance: string }[];
+  trend?: { name: string; price: number }[];
+}

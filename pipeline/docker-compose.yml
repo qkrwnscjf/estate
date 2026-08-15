@@ -14,35 +14,13 @@ services:
   collector:
     build: ./collector
     image: estate-collector:latest
-    # Airflow에서 이미지를 재사용하기 위한 서비스 정의 (단독 실행 안함)
+    # 로컬 테스트용 스크립트 실행 컨테이너
     command: echo "Collector image built"
-    networks:
-      - data-pipeline
-
-  airflow:
-    build: ./airflow
-    depends_on:
-      - clickhouse
-      - collector
-    environment:
-      - AIRFLOW__CORE__LOAD_EXAMPLES=False
-      - SUPABASE_URL=${SUPABASE_URL}
-      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
-      - VERCEL_REVALIDATE_URL=${VERCEL_REVALIDATE_URL}
-      - REVALIDATE_SECRET=${REVALIDATE_SECRET}
-      - OPEN_API_KEY=${OPEN_API_KEY}
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./airflow/dags:/opt/airflow/dags
-      - airflow-data:/opt/airflow
-    ports:
-      - "8080:8080"
     networks:
       - data-pipeline
 
 volumes:
   clickhouse-data:
-  airflow-data:
 
 networks:
   data-pipeline:

@@ -1,0 +1,43 @@
+name: Real Estate Data Pipeline
+
+on:
+  schedule:
+    # 매일 한국 시간 새벽 2시 (UTC 기준 17:00) - 일일 배치 (최근 2개월 Rolling Window)
+    - cron: '0 17 * * *'
+  workflow_dispatch: # 깃허브 웹에서 수동으로 실행할 수 있는 버튼 활성화
+
+jobs:
+  collect-and-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Install Collector Dependencies
+        run: |
+          cd pipeline/collector
+          npm install
+          
+      - name: Run Collector (MOLIT -> ClickHouse)
+        env:
+          OPEN_API_KEY: ${{ secrets.OPEN_API_KEY }}
+          CLICKHOUSE_URL: ${{ secrets.CLICKHOUSE_URL }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          cd pipeline/collector
+          npx ts-node src/collect.ts
+          
+      - name: Run Sync (ClickHouse -> Supabase)
+        env:
+          CLICKHOUSE_URL: ${{ secrets.CLICKHOUSE_URL }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          cd pipeline/collector
+          npx ts-node src/sync-to-supabase.ts

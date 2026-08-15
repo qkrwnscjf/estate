@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { Region, TrendPoint, RegionSummary, CompareResult } from './types';
+import { Region, TrendPoint, RegionSummary, CompareResult, Property } from './types';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
@@ -32,8 +32,18 @@ export async function getAllRegions(): Promise<Region[]> {
 
 export async function getRegionTrend(code: string, buildingType: string = '오피스텔', months: number = 12): Promise<TrendPoint[]> {
   const MOCK_TREND = [
-    { name: "1월", price: 16500 }, { name: "2월", price: 16700 }, { name: "3월", price: 17100 },
-    { name: "4월", price: 17000 }, { name: "5월", price: 17400 }, { name: "6월", price: 18000 }, { name: "7월", price: 18500 }
+    { name: "1주차", price: 16500 },
+    { name: "2주차", price: 16300 },
+    { name: "3주차", price: 16600 },
+    { name: "4주차", price: 16800 },
+    { name: "5주차", price: 16700 },
+    { name: "6주차", price: 17000 },
+    { name: "7주차", price: 17200 },
+    { name: "8주차", price: 17500 },
+    { name: "9주차", price: 17400 },
+    { name: "10주차", price: 17600 },
+    { name: "11주차", price: 17800 },
+    { name: "12주차", price: 18000 },
   ];
   if (!supabase) return MOCK_TREND;
 
@@ -116,4 +126,71 @@ export async function getLastUpdatedMonth(): Promise<string> {
   
   const d = new Date(data[0].month);
   return `${d.getFullYear()}년 ${d.getMonth() + 1}월`;
+}
+
+export async function getProperties(regionCode: string, maxRent: number = 9999, limit: number = 3): Promise<Property[]> {
+  // 실제 Supabase 데이터베이스 조회 (실데이터 연동)
+  if (supabase) {
+    const { data, error } = await supabase
+      .from('properties')
+      .select('*')
+      .eq('region_code', regionCode)
+      .lte('monthly_rent', maxRent)
+      .limit(limit);
+
+    // 데이터가 성공적으로 조회되면 실제 데이터 반환
+    if (!error && data && data.length > 0) {
+      return data.map((p, index) => ({
+        id: p.id,
+        regionCode: p.region_code,
+        name: p.name,
+        deposit: p.deposit,
+        monthlyRent: p.monthly_rent,
+        address: p.address,
+        url: p.url,
+        features: p.features || [],
+        lat: p.lat || (regionCode === '11680' ? 37.4979 : 37.5665) + Math.cos((index / data.length) * 2 * Math.PI) * 0.012,
+        lng: p.lng || (regionCode === '11680' ? 127.0276 : 126.9780) + Math.sin((index / data.length) * 2 * Math.PI) * 0.012,
+        contractDate: p.contract_date,
+        imageUrl: `https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80`,
+        monthlyAverage: "보증금 1200만 / 월세 55만",
+        surroundings: [
+          { type: "지하철", name: "역삼역 (2호선)", distance: "도보 5분" },
+          { type: "편의시설", name: "스타벅스", distance: "도보 2분" },
+          { type: "공원", name: "도곡공원", distance: "도보 10분" }
+        ]
+      }));
+    }
+  }
+
+  // 연결 실패나 데이터가 없을 경우를 대비한 가짜(Mock) 방어막
+  const MOCK_PROPERTIES: Record<string, Property[]> = {
+    "11440": [
+      { 
+        id: "p1", regionCode: "11440", name: "서교동 해링턴타워", deposit: 1000, monthlyRent: 60, address: "마포구 서교동", url: "#", features: ["신축"], lat: 37.5546, lng: 126.9200, contractDate: "2026-08-05",
+        imageUrl: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80",
+        monthlyAverage: "보증금 1000만 / 월세 58만",
+        surroundings: [{ type: "지하철", name: "홍대입구역", distance: "도보 3분" }, { type: "상권", name: "홍대거리", distance: "도보 1분" }]
+      },
+    ],
+    "11620": [
+      { 
+        id: "p4", regionCode: "11620", name: "신림 프라비다타워", deposit: 1000, monthlyRent: 50, address: "관악구 신림동", url: "#", features: ["초역세권"], lat: 37.4842, lng: 126.9297, contractDate: "2026-07-28",
+        imageUrl: "https://images.unsplash.com/photo-1502672260266-1c1de2d936b4?w=800&q=80",
+        monthlyAverage: "보증금 1000만 / 월세 45만",
+        surroundings: [{ type: "지하철", name: "신림역", distance: "도보 2분" }, { type: "편의시설", name: "타임스트림", distance: "도보 4분" }]
+      },
+    ]
+  };
+
+  const regionProps = MOCK_PROPERTIES[regionCode] || [
+    { 
+      id: "p99", regionCode: "11680", name: "강남 어반플레이스", deposit: 3000, monthlyRent: 80, address: "강남구 역삼동", url: "#", features: ["럭셔리"], lat: 37.4979, lng: 127.0276, contractDate: "2026-08-12",
+      imageUrl: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80",
+      monthlyAverage: "보증금 2500만 / 월세 85만",
+      surroundings: [{ type: "지하철", name: "강남역", distance: "도보 7분" }, { type: "상권", name: "테헤란로", distance: "도보 1분" }]
+    }
+  ];
+
+  return regionProps.filter(p => p.monthlyRent <= maxRent).slice(0, limit);
 }

@@ -85,16 +85,16 @@ graph TD
 
     subgraph Data Pipeline [Serverless Backend - GitHub Actions]
         Cron((Daily Cron Job)) --> Collect[collect.ts]
-        Collect -->|"Fetch API (Recent 2 Months)"| MOLIT["국토부 공공데이터 API"]
+        Collect -->|Fetch API Recent 2 Months| MOLIT[MOLIT Open API]
         Collect -->|Raw Inserts| ClickHouse[(ClickHouse)]
         
         Spark[Apache Spark transform.py]
         ClickHouse -->|Read Raw Data| Spark
-        Spark -->|Clean & Aggregate| Spark
+        Spark -->|Clean and Aggregate| Spark
         
         Sync[sync-to-supabase.ts]
         Spark -->|Refined Data| Sync
-        Sync -->|Upsert (Idempotency)| Postgres
+        Sync -->|Upsert Idempotency| Postgres
     end
 ```
 

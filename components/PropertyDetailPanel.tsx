@@ -97,7 +97,8 @@ export default function PropertyDetailPanel({ property, onClose }: PropertyDetai
                     <Tooltip 
                       contentStyle={{ borderRadius: '12px', border: '1px solid #E5E7E1', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', fontSize: '12px', fontWeight: 'bold' }}
                       labelStyle={{ color: '#647161', marginBottom: '4px' }}
-                      formatter={(value: any) => [`${Math.floor(value / 10000)}억 ${(value % 10000).toLocaleString()}만`, '평균가']}
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      formatter={(value: any) => [`${Math.floor(Number(value) / 10000)}억 ${(Number(value) % 10000).toLocaleString()}만`, '평균가']}
                     />
                     <Line 
                       type="monotone" 

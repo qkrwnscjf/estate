@@ -33,6 +33,7 @@ export default function AiSearchPage() {
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const [prompt, setPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [graphData, setGraphData] = useState<{nodes: any[], links: any[]}>(initialGraphData);
   const [aiReport, setAiReport] = useState<string>("");
   const [properties, setProperties] = useState<Property[]>([]);

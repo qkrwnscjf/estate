@@ -7,6 +7,29 @@
 ![PostgreSQL(Supabase)](https://img.shields.io/badge/Supabase-Database-3ECF8E)
 ![ClickHouse](https://img.shields.io/badge/ClickHouse-OLAP-FFCC01)
 ![Apache Spark](https://img.shields.io/badge/Apache_Spark-DE-E25A1C)
+![Llama 3](https://img.shields.io/badge/Meta_Llama_3.1-AI-0466C8)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-Design-38B2AC)
+
+---
+
+## Tech Stack
+
+**Frontend**
+- Next.js 14 (App Router), TypeScript, Tailwind CSS, Framer Motion
+- react-force-graph-2d (Canvas API), Recharts, React Leaflet (Map)
+
+**AI & Logic**
+- Groq SDK, Llama-3.1-8B-instant (Intent Extraction & Commentary)
+
+**Data Pipeline (Backend)**
+- Node.js (TypeScript) & Python 3.10
+- Apache PySpark, Pandas
+- GitHub Actions (Cron Job Scheduler)
+
+**Database & Cloud**
+- Supabase (PostgreSQL) - Serving DB
+- ClickHouse - OLAP Data Warehouse
+- Vercel - Serverless Hosting
 
 ---
 

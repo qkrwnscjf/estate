@@ -37,7 +37,7 @@ export async function POST(req: Request) {
     try {
       const intentStr = extractCompletion.choices[0]?.message?.content || '{}';
       intent = JSON.parse(intentStr);
-    } catch (e) {
+    } catch (e: unknown) {
       intent = { regionName: '강남구', buildingType: '오피스텔', maxMonthlyRent: 9999, limit: 3 }; // 파싱 실패 시 안전한 폴백 처리
     }
     
@@ -92,7 +92,7 @@ export async function POST(req: Request) {
       intent,
       properties: propertiesWithTrend
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("API Error:", error);
     return NextResponse.json({ error: "분석 중 서버 오류가 발생했습니다." }, { status: 500 });
   }

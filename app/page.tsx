@@ -22,11 +22,18 @@ const initialGraphData = {
   ]
 };
 
+interface GraphNode {
+  id: string;
+  label: string;
+  group: string;
+  [key: string]: unknown;
+}
+
 export default function AiSearchPage() {
-  const [selectedNode, setSelectedNode] = useState<any>(null);
+  const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const [prompt, setPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [graphData, setGraphData] = useState<any>(initialGraphData);
+  const [graphData, setGraphData] = useState<{nodes: any[], links: any[]}>(initialGraphData);
   const [aiReport, setAiReport] = useState<string>("");
   const [properties, setProperties] = useState<Property[]>([]);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
@@ -49,13 +56,18 @@ export default function AiSearchPage() {
       const data = await response.json();
       
       if (!data.error) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setGraphData((prev: any) => {
           // Merge nodes based on unique ID
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const existingNodeIds = new Set(prev.nodes.map((n: any) => n.id));
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const newNodes = data.graphData.nodes.filter((n: any) => !existingNodeIds.has(n.id));
           
           // Merge links
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const existingLinkKeys = new Set(prev.links.map((l: any) => `${l.source.id || l.source}-${l.target.id || l.target}`));
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const newLinks = data.graphData.links.filter((l: any) => !existingLinkKeys.has(`${l.source}-${l.target}`));
           
           return {
@@ -217,7 +229,7 @@ export default function AiSearchPage() {
                   <p className="animate-pulse tracking-wide font-medium text-lg">Mapping intelligence...</p>
                 </div>
               ) : (
-                <GraphViewer data={graphData} onNodeClick={setSelectedNode} />
+                <GraphViewer data={graphData} onNodeClick={(node: unknown) => setSelectedNode(node as GraphNode)} />
               )}
             </div>
           </div>

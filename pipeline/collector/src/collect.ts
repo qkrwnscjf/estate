@@ -72,7 +72,7 @@ async function fetchMolitData(regionCode: string, yearMonth: string, buildingTyp
   // XML-to-JSON 자동 변환된 결과가 배열이 아닐 수 있음 (1건일 경우)
   const itemList = Array.isArray(items) ? items : [items];
   
-  return itemList.map((item: any) => ({
+  return itemList.map((item: unknown) => ({
     region_code: regionCode,
     region_name: item.sggNm || "알수없음", // API 응답에 따라 필드명 다름
     building_type: buildingType,
@@ -115,7 +115,7 @@ async function collect() {
         } else {
           console.log('No data found.');
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error(`Error fetching for ${regionCode} ${yearMonth}:`, err.message);
       }
       

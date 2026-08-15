@@ -1,6 +1,7 @@
 import React, { useCallback, useRef, useState, useEffect } from 'react';
 import ForceGraph2D from 'react-force-graph-2d';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function GraphViewerClient({ data, onNodeClick }: { data: any, onNodeClick?: (node: any) => void }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
@@ -19,10 +20,12 @@ export default function GraphViewerClient({ data, onNodeClick }: { data: any, on
     return () => observer.disconnect();
   }, []);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleNodeClick = useCallback((node: any) => {
     if (onNodeClick) onNodeClick(node);
   }, [onNodeClick]);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const paintNode = useCallback((node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
     const label = node.label || '';
     const fontSize = 14 / globalScale;
@@ -49,8 +52,10 @@ export default function GraphViewerClient({ data, onNodeClick }: { data: any, on
     ctx.fillStyle = bgColor;
     ctx.beginPath();
     // Fallback for older browsers if roundRect isn't supported, though nextjs apps usually run on modern browsers
-    if (ctx.roundRect) {
-      ctx.roundRect(node.x - bgWidth / 2, node.y - bgHeight / 2, bgWidth, bgHeight, [bgHeight / 2]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((ctx as any).roundRect) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (ctx as any).roundRect(node.x - bgWidth / 2, node.y - bgHeight / 2, bgWidth, bgHeight, [bgHeight / 2]);
     } else {
       ctx.rect(node.x - bgWidth / 2, node.y - bgHeight / 2, bgWidth, bgHeight);
     }

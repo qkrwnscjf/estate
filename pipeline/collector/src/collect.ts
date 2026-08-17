@@ -91,7 +91,7 @@ async function fetchMolitData(regionCode: string, yearMonth: string, buildingTyp
     region_code: regionCode,
     region_name: item.sggNm || "알수없음", // API 응답에 따라 필드명 다름
     building_type: buildingType,
-    contract_date: `${yearMonth}-${String(item.조일 || '01').padStart(2, '0')}`,
+    contract_date: `${yearMonth.substring(0, 4)}-${yearMonth.substring(4, 6)}-${String(item.조일 || item.일 || '01').padStart(2, '0')}`,
     deposit: Number(item.보증금액?.replace(/,/g, '') || 0),
     monthly_rent: Number(item.월세금액?.replace(/,/g, '') || 0),
     jeonse_converted: Number(item.보증금액?.replace(/,/g, '') || 0) + (Number(item.월세금액?.replace(/,/g, '') || 0) * 100), // 임의의 전세환산 로직

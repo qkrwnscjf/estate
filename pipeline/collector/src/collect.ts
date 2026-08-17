@@ -78,7 +78,10 @@ async function fetchMolitData(regionCode: string, yearMonth: string, buildingTyp
   }
 
   const items = data?.response?.body?.items?.item;
-  if (!items) return [];
+  if (!items) {
+    console.error(`[MOLIT API WARNING] No items found for ${regionCode} ${yearMonth}. Response:`, JSON.stringify(data).substring(0, 300));
+    return [];
+  }
 
   // XML-to-JSON 자동 변환된 결과가 배열이 아닐 수 있음 (1건일 경우)
   const itemList = Array.isArray(items) ? items : [items];

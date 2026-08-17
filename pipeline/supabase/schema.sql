@@ -24,6 +24,7 @@ CREATE TABLE pipeline_logs (
 -- 익명 조회 권한만 허용 (Row Level Security)
 ALTER TABLE region_reference ENABLE ROW LEVEL SECURITY;
 ALTER TABLE region_trend ENABLE ROW LEVEL SECURITY;
+ALTER TABLE pipeline_logs ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "public read" ON region_reference FOR SELECT USING (true);
 CREATE POLICY "public read" ON region_trend FOR SELECT USING (true);
 

@@ -7,12 +7,12 @@ import path from 'path';
 dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 import WebSocket from 'ws';
+(globalThis as any).WebSocket = WebSocket;
 
 // pipeline_logs 조회를 위한 Supabase 클라이언트
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { global: { WebSocket } }
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
 program

@@ -4,11 +4,11 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import WebSocket from 'ws';
+(globalThis as any).WebSocket = WebSocket;
 
 const supabase = createClient(
   (process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL)!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { global: { WebSocket } }
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
 async function sync() {

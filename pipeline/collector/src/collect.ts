@@ -1,6 +1,6 @@
 import { program } from 'commander';
 import { createClient } from '@supabase/supabase-js';
-import { chClient } from './clickhouse';
+import { chClient, initClickHouseSchema } from './clickhouse';
 import axios from 'axios';
 import dotenv from 'dotenv';
 import path from 'path';
@@ -86,6 +86,7 @@ async function fetchMolitData(regionCode: string, yearMonth: string, buildingTyp
 }
 
 async function collect() {
+  await initClickHouseSchema();
   const months = await getLookbackMonths();
   console.log(`Starting collection for ${options.buildingType}, dynamically looking back ${months} months...`);
   

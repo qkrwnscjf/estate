@@ -52,6 +52,8 @@ async function delay(ms: number) {
 }
 
 
+import { XMLParser } from 'fast-xml-parser';
+
 async function fetchMolitData(regionCode: string, yearMonth: string, buildingType: string) {
   // 공공데이터포털 국토교통부 오피스텔/아파트 실거래가 API 엔드포인트
   const MOLIT_API_KEY = process.env.OPEN_API_KEY;
@@ -69,7 +71,13 @@ async function fetchMolitData(regionCode: string, yearMonth: string, buildingTyp
     }
   });
 
-  const items = response.data?.response?.body?.items?.item;
+  let data = response.data;
+  if (typeof data === 'string') {
+    const parser = new XMLParser();
+    data = parser.parse(data);
+  }
+
+  const items = data?.response?.body?.items?.item;
   if (!items) return [];
 
   // XML-to-JSON 자동 변환된 결과가 배열이 아닐 수 있음 (1건일 경우)
